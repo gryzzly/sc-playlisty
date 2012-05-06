@@ -1,0 +1,43 @@
+<!doctype html>
+<head>
+    <meta charset=utf-8>
+    <link rel="stylesheet" href="css/sc-player-minimal.css">
+</head>
+<body>
+    <div class="main">
+        <div class="search">
+            <form action="/"><input class="search-input"></form>
+        </div>
+    </div>
+    <script type="tpl/html" id="app-tpl">
+        <div class="main"></div>
+    </script>
+    <script type="tpl/html" id="search-tpl">
+        <form class="search">
+            <input class="search-input">
+        </form>
+    </script>
+    <script type="tpl/html" id="track-tpl">
+        <label><input type="checkbox"> {{author}} – {{title}}</label>
+    </script>
+    <script>isMobile = true;</script>
+    <script src="lib/LAB.js"></script>
+    <script>
+        $LAB
+        .script(
+            'http://connect.soundcloud.com/sdk.js'
+        )
+        .script(
+            'lib/' + (isMobile ? 'zepto.js' : 'jquery.js'), 
+            'lib/underscore.js',
+            'lib/mustache.js'
+        ).wait()
+        // $ dependant SoundCloud plugins
+        .script(
+            'lib/soundcloud.player.api.js',
+            'lib/sc-player.js'
+        )
+        .script('lib/backbone.js').wait()
+        .script('js/app.js');
+    </script>
+</body>
