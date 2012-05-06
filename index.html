@@ -1,25 +1,36 @@
 <!doctype html>
 <head>
     <meta charset=utf-8>
-    <link rel="stylesheet" href="css/sc-player-minimal.css">
+    <style>
+        .active {
+            font-weight:bold;
+        }
+    </style>
 </head>
 <body>
     <div class="main">
+        <div class="playlists">
+            <select>
+            </select>
+            <button>Add new playlist</button>
+        </div>
         <div class="search">
-            <form action="/"><input class="search-input"></form>
+            <form action="/"><input class="search-input" placeholder="search for tracks to add them"></form>
+            <ul class="search-results"></ul>
         </div>
     </div>
-    <script type="tpl/html" id="app-tpl">
-        <div class="main"></div>
-    </script>
-    <script type="tpl/html" id="search-tpl">
-        <form class="search">
-            <input class="search-input">
-        </form>
-    </script>
+
+    <!-- ========================== Templates ============================= -->
     <script type="tpl/html" id="track-tpl">
-        <label><input type="checkbox"> {{author}} – {{title}}</label>
+        <li class="track" data-track-cid="{{cid}}">
+            <button>toggle</button><label><input type="checkbox"> {{author}} – {{title}}</label>
+        </li>
     </script>
+    <script type="tpl/html" id="playlist-tpl">
+        <option value={{cid}}>{{title}}</option>
+    </script>
+
+    <!-- ========================= Application ============================ -->
     <script>isMobile = true;</script>
     <script src="lib/LAB.js"></script>
     <script>
@@ -32,11 +43,6 @@
             'lib/underscore.js',
             'lib/mustache.js'
         ).wait()
-        // $ dependant SoundCloud plugins
-        .script(
-            'lib/soundcloud.player.api.js',
-            'lib/sc-player.js'
-        )
         .script('lib/backbone.js').wait()
         .script('js/app.js');
     </script>

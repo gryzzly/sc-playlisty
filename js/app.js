@@ -1,12 +1,10 @@
 ~function (doc, win, $, _, Backbone, undefined) {
-
-    // SC API config
+    // SC SDK config
     SC.initialize({
         client_id: "7118ab0b5da08eafa2a36a2fca98a905"
     }); 
-    // $.scPlayer.defaults.onDomReady = null;
 
-    // Use SC object to do requests
+    // Use SDK to communicate with SC
     Backbone.sync = function (method, model, options) {
         if ( method === "read" ) {
             SC.get(
@@ -30,7 +28,9 @@
         },
         search: function (e) {
             e.preventDefault();
-            router.navigate("search/" + encodeURIComponent(this.input.val()), {trigger: true});
+            router.navigate("search/" + encodeURIComponent(this.input.val()), {
+                trigger: true
+            });
         }
     }));
     
@@ -39,57 +39,128 @@
 
     // Single track model
     var Track = Backbone.Model.extend();
-    // Single track view
-    var TrackView = Backbone.View.extend({
-        tagName: 'li',
-        template: $('#track-tpl').html(),
+    // Tracks view
+    var tracksView, TracksView = Backbone.View.extend({
+        el: $('.search-results'),
+        trackTemplate: $('#track-tpl').html(),
         initialize: function () {
+            this.collection.on('reset', function () {
+                this.render();
+            }, this);
             this.render();
         },
         render: function () {
-            $('body').append(this.$el.html( Mustache.render(this.template, {
-                title: this.model.get('title'),
-                author: this.model.get('user').username
-            })));
-            // prepare player object
-            SC.stream('/tracks/' + this.model.get("id"), function (player) {
-                this.player = player;
-            }.bind(this));
+            var html = [];
+            // render each track and prepare player objects
+            this.collection.forEach(function (model) {
+                html.push(Mustache.render(this.trackTemplate, {
+                    title: model.get('title'),
+                    author: model.get('user').username,
+                    cid: model.cid
+                }));
+                // TODO: isn't there a way to have one controller with list of tracks?
+                SC.stream(
+                    '/tracks/' + model.get("id"),
+                    { preferFlash: false },
+                    function (player) {
+                        model.player = player;
+                    }.bind(this)
+                );
+            }, this);
+            // insert collection into the DOM
+            this.$el.html(html.join(''));
             return this;
         },
         events: {
-            "change input" : "toggle"
+            "click button" : "toggle",
+            "change input" : "select"
         },
         toggle: function (e) {
-            this.player.togglePause();
+            var target = $(e.target), cid, model;
+            target.toggleClass('active');
+            cid = target.closest('.track').data('track-cid');
+            // TODO: don't store reference to model in DOM 
+            model = this.collection.getByCid(cid);
+            model.player && model.player.togglePause();
+        },
+        select: function (e) {
+            var target = $(e.target);
+            target.parent()[(e.target.checked ? 'add' : 'remove') + 'Class']('active');
+            var cid = target.closest('.track').data('track-cid');
+            this.collection.getByCid(cid).set('selected', e.target.checked);
         }
     });
     // Tracks collection
-    var tracks = new (Backbone.Collection.extend({
+    var tracks, Tracks = Backbone.Collection.extend({
         model: Track,
-        url: "/tracks.json",
-        initialize: function () {
-            // on track retrieval initialize track views
-            this.on('reset', function () {
-                tracks.forEach(function (track) {
-                    // move to tracks view
-                    new TrackView({ model: track })
-                });
-            });
+        url: "/tracks.json"
+    });
+
+    // initialize tracks
+    tracksView = new TracksView({ collection: (tracks = new Tracks) });
+
+    // PlayLists
+    // ========================================================================
+    var Playlist = Backbone.Model.extend({
+        defaults: {
+            title: "Untitled Playlist",
+            description: "",
+            tracks: []
         }
-    }));
+    });
+    var playlists, Playlists = Backbone.Collection.extend({
+        model: Playlist
+    });
+    var playlistsView, PlaylistsView = Backbone.View.extend({
+        el: $('.playlists'),
+        template: $('#playlist-tpl').html(),
+        render: function () {
+            var self = this;
+            this.$el.find('select').html(function (){ 
+                var lists = [];
+                self.collection.forEach(function (playlist) {
+                    lists.push(Mustache.render(self.template, playlist.toJSON()));
+                });
+                return lists.join('');
+            }());
+        },
+        initialize: function () {
+            this.collection.on('change add reset', this.render, this);
+            this.render();
+        },
+        events: {
+            "click button" : "add",
+            "change select" : "select"
+        },
+        add: function () {
+            var name = prompt("Please enter the name of new playlist"), playlist;
+            this.collection.add({ title: name });
+            playlist = this.collection.last();
+            this.setActive(playlist);
+        },
+        select: function (e) {
+            this.setActive(this.collection.getByCid(e.target.value));
+        },
+        setActive: function (playlist) {
+            this.collection.active = playlist;
+            router.navigate(playlist.get('title'));
+        }
+    });
+    // initialize playlists
+    playlistsView = new PlaylistsView({ collection: playlists = new Playlists() });
 
     // Routes
     // ========================================================================
     var router = new (Backbone.Router.extend({
         routes: {
-            "search/:query" : "search"
+            ":playlist" : "playlist",
+            ":playlist/?search=:query" : "search"
+        },
+        playlist: function (playlist) {
+            
         },
         search: function (query) {
-            // set input to previous query 
-            searchView.input.val(query);
             // perform search
-            console.log(query);
             tracks.fetch({
                 data: {
                     // will load tracks.url + '&q=%query%'
