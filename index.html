@@ -12,22 +12,33 @@
         <div class="playlists">
             <select>
             </select>
-            <button>Add new playlist</button>
+            <button class="playlist-new">+ Add new playlist</button>
+            <div class="playlist-controls"></div>
         </div>
         <div class="search">
-            <form action="/"><input class="search-input" placeholder="search for tracks to add them"></form>
+            <form action="/">
+                <input class="search-input" placeholder="create playlist to search for tracks" disabled>
+            </form>
             <ul class="search-results"></ul>
         </div>
     </div>
 
     <!-- ========================== Templates ============================= -->
     <script type="tpl/html" id="track-tpl">
-        <li class="track" data-track-cid="{{cid}}">
-            <button>toggle</button><label><input type="checkbox"> {{author}} – {{title}}</label>
+        <li class="track" data-track-id="{{id}}">
+            <button>toggle</button>
+            <label><input type="checkbox"> {{author}} – {{title}}</label>
         </li>
     </script>
+    <script type="tpl/html" id="playlist-option-tpl">
+        <option value={{id}}>{{title}}</option>
+    </script>
     <script type="tpl/html" id="playlist-tpl">
-        <option value={{cid}}>{{title}}</option>
+        <h3>{{title}}</h3>
+        <p class="description">{{description}}</p>
+        <button class="playlist-add" disabled>Save selected tracks to playlist</button>
+        <button class="playlist-remove">Remove this playlist</button>
+        <div class="tracks"></div>
     </script>
 
     <!-- ========================= Application ============================ -->
@@ -35,15 +46,19 @@
     <script src="lib/LAB.js"></script>
     <script>
         $LAB
+        // SC SDK
         .script(
             'http://connect.soundcloud.com/sdk.js'
         )
+        // libraries
         .script(
             'lib/' + (isMobile ? 'zepto.js' : 'jquery.js'), 
             'lib/underscore.js',
             'lib/mustache.js'
         ).wait()
         .script('lib/backbone.js').wait()
+        // application files
+        .script('js/playlists.js', 'js/tracks.js', 'js/router.js', 'js/search.js').wait()
         .script('js/app.js');
     </script>
 </body>

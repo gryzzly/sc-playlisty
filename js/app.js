@@ -1,4 +1,12 @@
-~function (doc, win, $, _, Backbone, undefined) {
+// TODO:
+// - add tracks to chosen playlist
+// - view single playlist and edit it
+// - play all tracks in playlist from single "play" button
+// - change order of tracks
+// - persist playlists to local storage
+// - add JSON lib for the incapable
+//
+~function (doc, win, $, _, Backbone, yayo, undefined) {"use strict";
     // SC SDK config
     SC.initialize({
         client_id: "7118ab0b5da08eafa2a36a2fca98a905"
@@ -16,161 +24,42 @@
         }
     };
 
-    // Searching
-    // ========================================================================
-    var searchView = new (Backbone.View.extend({
-        el: $('.search'),
+    // NOTE: 
+    // instances are starting with lower case letters,
+    // constructors and modules are starting with uppercase 
+    //
+    // @example: 
+    // yayo.tracks // instance of yayo.Tracks.Collection 
+    // yayo.Tracks // module containing all tracks related contructors (Model, Collection and View)
+    // yayo.Tracks.Collection // constructor to instantiate collections of tracks
+
+    yayo.app = new (Backbone.View.extend({
         initialize: function () {
-            this.input = this.$el.find('input');
-        },
-        events: {
-            "submit form" : "search"
-        },
-        search: function (e) {
-            e.preventDefault();
-            router.navigate("search/" + encodeURIComponent(this.input.val()), {
-                trigger: true
+            // initialize router
+            yayo.router = new yayo.Router();
+            // initialize history
+            Backbone.history.start();
+            // initialize playlists
+            yayo.playlistsView = new yayo.Playlists.View({
+                collection: (yayo.playlists = new yayo.Playlists.Collection())
             });
-        }
-    }));
-    
-    // Tracks
-    // ========================================================================
+            // initialize search 
+            yayo.searchController = new yayo.SearchController();
 
-    // Single track model
-    var Track = Backbone.Model.extend();
-    // Tracks view
-    var tracksView, TracksView = Backbone.View.extend({
-        el: $('.search-results'),
-        trackTemplate: $('#track-tpl').html(),
-        initialize: function () {
-            this.collection.on('reset', function () {
-                this.render();
-            }, this);
-            this.render();
-        },
-        render: function () {
-            var html = [];
-            // render each track and prepare player objects
-            this.collection.forEach(function (model) {
-                html.push(Mustache.render(this.trackTemplate, {
-                    title: model.get('title'),
-                    author: model.get('user').username,
-                    cid: model.cid
-                }));
-                // TODO: isn't there a way to have one controller with list of tracks?
-                SC.stream(
-                    '/tracks/' + model.get("id"),
-                    { preferFlash: false },
-                    function (player) {
-                        model.player = player;
-                    }.bind(this)
-                );
-            }, this);
-            // insert collection into the DOM
-            this.$el.html(html.join(''));
-            return this;
-        },
-        events: {
-            "click button" : "toggle",
-            "change input" : "select"
-        },
-        toggle: function (e) {
-            var target = $(e.target), cid, model;
-            target.toggleClass('active');
-            cid = target.closest('.track').data('track-cid');
-            // TODO: don't store reference to model in DOM 
-            model = this.collection.getByCid(cid);
-            model.player && model.player.togglePause();
-        },
-        select: function (e) {
-            var target = $(e.target);
-            target.parent()[(e.target.checked ? 'add' : 'remove') + 'Class']('active');
-            var cid = target.closest('.track').data('track-cid');
-            this.collection.getByCid(cid).set('selected', e.target.checked);
-        }
-    });
-    // Tracks collection
-    var tracks, Tracks = Backbone.Collection.extend({
-        model: Track,
-        url: "/tracks.json"
-    });
+            // enable search input if some playlist's selected
+            yayo.playlists.on('set-active', function () {
+                yayo.searchController.input.prop('disabled', !yayo.playlists.active);
+            }, this).trigger('set-active');
 
-    // initialize tracks
-    tracksView = new TracksView({ collection: (tracks = new Tracks) });
-
-    // PlayLists
-    // ========================================================================
-    var Playlist = Backbone.Model.extend({
-        defaults: {
-            title: "Untitled Playlist",
-            description: "",
-            tracks: []
-        }
-    });
-    var playlists, Playlists = Backbone.Collection.extend({
-        model: Playlist
-    });
-    var playlistsView, PlaylistsView = Backbone.View.extend({
-        el: $('.playlists'),
-        template: $('#playlist-tpl').html(),
-        render: function () {
-            var self = this;
-            this.$el.find('select').html(function (){ 
-                var lists = [];
-                self.collection.forEach(function (playlist) {
-                    lists.push(Mustache.render(self.template, playlist.toJSON()));
-                });
-                return lists.join('');
-            }());
-        },
-        initialize: function () {
-            this.collection.on('change add reset', this.render, this);
-            this.render();
-        },
-        events: {
-            "click button" : "add",
-            "change select" : "select"
-        },
-        add: function () {
-            var name = prompt("Please enter the name of new playlist"), playlist;
-            this.collection.add({ title: name });
-            playlist = this.collection.last();
-            this.setActive(playlist);
-        },
-        select: function (e) {
-            this.setActive(this.collection.getByCid(e.target.value));
-        },
-        setActive: function (playlist) {
-            this.collection.active = playlist;
-            router.navigate(playlist.get('title'));
-        }
-    });
-    // initialize playlists
-    playlistsView = new PlaylistsView({ collection: playlists = new Playlists() });
-
-    // Routes
-    // ========================================================================
-    var router = new (Backbone.Router.extend({
-        routes: {
-            ":playlist" : "playlist",
-            ":playlist/?search=:query" : "search"
-        },
-        playlist: function (playlist) {
-            
-        },
-        search: function (query) {
-            // perform search
-            tracks.fetch({
-                data: {
-                    // will load tracks.url + '&q=%query%'
-                    q: query 
-                }
+            // enable "save selected" button on current playlist
+            yayo.searchController.tracks.on('checkbox', function () {
+                yayo.playlists.active.view
+                    .$el.find('.playlist-add').prop('disabled', this.getSelected().length = 0);
             });
+
         }
     }));
 
-    // initialize history change handler
-    Backbone.history.start();
 
-}(document, window, window.jQuery || window.Zepto, _, Backbone);
+
+}(document, window, window.jQuery || window.Zepto, _, Backbone, window.yayo || (window.yayo = {}));
