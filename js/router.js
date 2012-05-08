@@ -1,34 +1,22 @@
-// Routes
+// Router
 // ========================================================================
-~function (yayo) {"use strict";
-
-    // Router takes care of switching states between playlists and searches
+~function (yayo) {'use strict';
 
     yayo.Router = Backbone.Router.extend({
         routes: {
-            ":playlist" : "playlist",
-            ":playlist/search/:query" : "search"
+            "playlists" : "playlists",
+            "playlists/:playlist/" : "playlist",
+            "playlists/:playlist/search/:query" : "search"
+        },
+        playlists: function (playlist) {
+            console.log('at playlists view');
         },
         playlist: function (playlist) {
-            playlist = yayo.playlists && yayo.playlists.find(function (_playlist) {
-                return _playlist.get('title') === playlist;
-            });
-            // TODO: handle navigating directly to url without having "selected" playlist in memory
-            if (playlist) {
-                console.log('playlist ' + playlist.get('title') + ' is now active; playlist route');
-            } else {
-                this.navigate();
-            }
+            console.log('at ' + playlist + ' view');
         },
         search: function (playlist, query) {
-            // perform search
-            yayo.searchController.tracks.fetch({
-                data: {
-                    // will load tracks.url + '&q=%query%'
-                    q: query 
-                }
-            });
+            console.log('at ' + playlist + ' view, with search query: ' + query);
         }
     });
 
-}(window.yayo || (window.yayo = {}));
+}(window.yayo || (window.yayo = {}))

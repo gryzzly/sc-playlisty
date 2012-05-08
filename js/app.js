@@ -1,16 +1,11 @@
-// TODO:
-// - add tracks to chosen playlist
-// - view single playlist and edit it
-// - play all tracks in playlist from single "play" button
-// - change order of tracks
-// - persist playlists to local storage
-// - add JSON lib for the incapable
-//
-~function (doc, win, $, _, Backbone, yayo, undefined) {"use strict";
+// App
+// ========================================================================
+~function (yayo) {
+
     // SC SDK config
     SC.initialize({
         client_id: "7118ab0b5da08eafa2a36a2fca98a905"
-    }); 
+    });
 
     // Use SDK to communicate with SC
     Backbone.sync = function (method, model, options) {
@@ -24,42 +19,32 @@
         }
     };
 
-    // NOTE: 
-    // instances are starting with lower case letters,
-    // constructors and modules are starting with uppercase 
-    //
-    // @example: 
-    // yayo.tracks // instance of yayo.Tracks.Collection 
-    // yayo.Tracks // module containing all tracks related contructors (Model, Collection and View)
-    // yayo.Tracks.Collection // constructor to instantiate collections of tracks
-
-    yayo.app = new (Backbone.View.extend({
+    yayo.App = Backbone.View.extend({
         initialize: function () {
             // initialize router
             yayo.router = new yayo.Router();
             // initialize history
             Backbone.history.start();
-            // initialize playlists
-            yayo.playlistsView = new yayo.Playlists.View({
-                collection: (yayo.playlists = new yayo.Playlists.Collection())
-            });
-            // initialize search 
-            yayo.searchController = new yayo.SearchController();
-
-            // enable search input if some playlist's selected
-            yayo.playlists.on('set-active', function () {
-                yayo.searchController.input.prop('disabled', !yayo.playlists.active);
-            }, this).trigger('set-active');
-
-            // enable "save selected" button on current playlist
-            yayo.searchController.tracks.on('checkbox', function () {
-                yayo.playlists.active.view
-                    .$el.find('.playlist-add').prop('disabled', this.getSelected().length = 0);
-            });
-
+            // default page's playlists
+            this.page(yayo.playlistsView = new yayo.PlaylistsView({
+                collection: (yayo.playlists = new yayo.Playlists)
+            }));
+        },
+        page: function (view) {
+            console.log("app.page calld with route:", view.route)
+            yayo.router.navigate(view.route, { trigger: true });
+            // allow back navigation
+            this._previousPage = this._currentPage;
+            this._currentPage = view;
+            // toggle DOM classes
+            if (this._previousPage) this._previousPage.$el.addClass('hidden')
+            this._currentPage.$el.removeClass('hidden');
+        },
+        back: function () {
+            this.page(this._previousPage);
         }
-    }));
+    });
 
+    yayo.app = new yayo.App();
 
-
-}(document, window, window.jQuery || window.Zepto, _, Backbone, window.yayo || (window.yayo = {}));
+}(window.yayo || (window.yayo = {}))

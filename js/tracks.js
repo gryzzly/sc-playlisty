@@ -49,7 +49,12 @@
                 // TODO: isn't there a way to have one controller with list of tracks?
                 SC.stream(
                     '/tracks/' + model.get('id'),
-                    { preferFlash: false },
+                    {
+                        preferFlash: false,
+                        onfinish: _.bind(function () {
+                            this.collection.getByCid(this.model.get('id')).player.play();
+                        }, this)
+                    },
                     function (player) {
                         model.player = player;
                     }.bind(this)
@@ -67,7 +72,7 @@
             var target = $(e.target), cid, model;
             target.toggleClass('active');
             cid = target.closest('.track').data('track-id');
-            // TODO: don't store reference to model in DOM 
+            // TODO: don't store reference to model in DOM
             model = this.collection.getByCid(cid);
             model.player && model.player.togglePause();
         },
@@ -76,7 +81,9 @@
             target.parent()[(e.target.checked ? 'add' : 'remove') + 'Class']('active');
             var cid = target.closest('.track').data('track-id');
             this.collection.getByCid(cid).selected = e.target.checked;
-            this.collection.trigger('checkbox');
+            this.collection.trigger(
+                (this.collection.getSelected().length > 0 ? '' : 'de' ) + 'selected'
+            );
         }
     });
 

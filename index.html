@@ -5,28 +5,27 @@
         .active {
             font-weight:bold;
         }
+        .hidden {
+            display:none;
+        }
     </style>
 </head>
 <body>
     <div class="main">
-        <div class="playlists">
-            <select>
+        <div class="playlists page">
+            <h3>SoundCloud playlists</h3>
+            <select size="4">
             </select>
             <button class="playlist-new">+ Add new playlist</button>
-            <div class="playlist-controls"></div>
         </div>
-        <div class="search">
-            <form action="/">
-                <input class="search-input" placeholder="create playlist to search for tracks" disabled>
-            </form>
-            <ul class="search-results"></ul>
+        <div class="playlist hidden page">
         </div>
     </div>
 
     <!-- ========================== Templates ============================= -->
     <script type="tpl/html" id="track-tpl">
         <li class="track" data-track-id="{{id}}">
-            <button>toggle</button>
+            <button>listen</button>
             <label><input type="checkbox"> {{author}} – {{title}}</label>
         </li>
     </script>
@@ -34,15 +33,21 @@
         <option value={{id}}>{{title}}</option>
     </script>
     <script type="tpl/html" id="playlist-tpl">
+        <a href="#" class="back">← back</a>
         <h3>{{title}}</h3>
         <p class="description">{{description}}</p>
         <button class="playlist-add" disabled>Save selected tracks to playlist</button>
         <button class="playlist-remove">Remove this playlist</button>
         <div class="tracks"></div>
     </script>
+    <script type="tpl/html" id="search-tpl">
+        <form action="/">
+            <input class="search-input" placeholder="search for tracks">
+        </form>
+        <ul class="search-results"></ul>
+    </script>
 
     <!-- ========================= Application ============================ -->
-    <script>isMobile = true;</script>
     <script src="lib/LAB.js"></script>
     <script>
         $LAB
@@ -50,9 +55,11 @@
         .script(
             'http://connect.soundcloud.com/sdk.js'
         )
+        // detect mobile browsers
+        .script('lib/ismobile.js').wait()
         // libraries
         .script(
-            'lib/' + (isMobile ? 'zepto.js' : 'jquery.js'), 
+            'lib/' + (window.isMobile ? 'zepto.js' : 'jquery.js'),
             'lib/underscore.js',
             'lib/mustache.js'
         ).wait()

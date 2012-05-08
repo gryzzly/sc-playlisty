@@ -1,21 +1,21 @@
 // Searching
 // ========================================================================
-~function (yayo) {"use strict";
+~function (yayo) {'use strict';
 
     // Search component is responsible for firing search over SC API
-    // and that holds reference to the list of tracks returned from that search.
-    // To retrieve tracks from search results, talk to SearchController.tracks 
+    // and holds reference to the list of tracks returned from that search.
+    // To retrieve tracks from search results, talk to SearchView.tracks
     // collection.
-    //
-    // Search input is disabled by default, it only get activated when 
-    // some playlist is selected. Controlled by yayo.app
-    // 
-    // Search controller depends on an instance of Playlists collection
-    // as it needs to have knowledge about the current playlist.
 
-    yayo.SearchController = Backbone.View.extend({
-        el: $('.search'),
+    yayo.SearchView = Backbone.View.extend({
+        tagName: 'div',
+        className: 'search',
+        tpl: $('#search-tpl').html(),
+        render: function () {
+            this.$el.html($(this.tpl));
+        },
         initialize: function () {
+            this.render();
             this.input = this.$el.find('input');
             // tracks related to search
             this.tracksView = new yayo.Tracks.View({
@@ -23,6 +23,10 @@
             });
             // append tracks view to hold search results
             this.$el.find('.search-results').html(this.tracksView.$el);
+            // propagate 'selected' events when tracks are selected
+            this.tracks.on('selected', function () {
+                this.trigger('selected');
+            }, this);
         },
         events: {
             "submit form" : "search"
@@ -30,8 +34,15 @@
         search: function (e) {
             e.preventDefault();
             console.log('searching for ' + this.input.val());
+            this.tracks.fetch({
+                data: {
+                    q: this.input.val()
+                }
+            });
             yayo.router.navigate(
-                yayo.playlists.active.get('title') + '/search/' + encodeURIComponent(this.input.val()), 
+                yayo.playlists.activeView.route +
+                '/search/' +
+                encodeURIComponent(this.input.val()),
                 { trigger: true }
             );
         }
