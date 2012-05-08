@@ -32,10 +32,11 @@
         tagName: 'div',
         className: 'tracks-list',
         template: $('#track-tpl').html(),
-        initialize: function () {
+        initialize: function (isSearch) {
             this.collection.on('reset', function () {
                 this.render();
             }, this).trigger('reset');
+            isSearch && (this.isSearch = true);
         },
         render: function () {
             var html = [];
@@ -44,7 +45,8 @@
                 html.push(Mustache.render(this.template, {
                     title: model.get('title'),
                     author: model.get('user').username,
-                    id: model.get('id')
+                    id: model.get('id'),
+                    search: this.isSearch
                 }));
                 // TODO: isn't there a way to have one controller with list of tracks?
                 SC.stream(
