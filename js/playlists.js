@@ -2,7 +2,7 @@
 // ========================================================================
 ~function (yayo) {'use strict';
 
-    // In memory copy of localStorage['yayo']
+    // Memory copy of localStorage['yayo']
     var _store;
 
     // Single playlist
@@ -55,7 +55,7 @@
         },
         initialize: function () {
             // assign route based on playlist's title
-            this.route = 'playlists/' + encodeURIComponent(this.model.get('title')),
+            this.route = 'playlists/' + encodeURIComponent(this.model.get('title'));
             // tracks related to a playlist
             this.tracksView = new yayo.Tracks.View({
                 collection: new yayo.Tracks.Collection(this.model.get('tracks'))
@@ -64,11 +64,21 @@
             this.model.on('reset change add', function () {
                 this.tracksView.collection.reset(this.model.get('tracks'));
             }, this);
+
+            // update controls
+            this.tracksView.on('play', function () {
+                this.$el.find('.toggle').text('pause');
+            }, this);
+            this.tracksView.on('pause', function () {
+                this.$el.find('.toggle').text('play');
+            }, this);
+
             this.render();
         },
         events: {
             'click .playlist-add': 'addTracks',
-            'click .back': 'back'
+            'click .page-back': 'list',
+            "click .toggle" : "toggle"
         },
         addTracks: function (e) {
             // add tracks from search to the playlist
@@ -77,9 +87,16 @@
                 this.model.get('tracks').concat(this.search.tracks.getSelected())
             );
         },
-        back: function (e) {
+        list: function (e) {
             e.preventDefault();
-            yayo.app.back();
+            console.log('to list view');
+            yayo.app.page(yayo.playlistsView);
+            yayo.router.navigate('playlists', true)
+        },
+        toggle: function (e) {
+            this.playing = !this.playing;
+            var tracks = this.tracksView.collection;
+            this.tracksView.toggle(tracks.current || tracks.first());
         }
     });
 
@@ -107,17 +124,32 @@
                 this.store();
             }, this);
             this.restore();
+        },
+        getByTitle: function (title) {
+            return this.find(function(playlist) {
+                return playlist.get('title') === title;
+            });
+        },
+        setActive: function (playlist) {
+            console.log('setting active playlist ' + playlist.get('title'));
+
+            if (this.active !== playlist) {
+                // save references to active playlist and its view
+                this.active = playlist;
+                // initialize playlist view
+                this.activeView = new yayo.PlaylistView({ model: playlist });
+            }
         }
     });
     // Playlists view
     yayo.PlaylistsView = Backbone.View.extend({
         el: $('.playlists'),
-        template: $('#playlist-option-tpl').html(),
+        template: $('#playlist-item-tpl').html(),
         // Render playlists into select box
         render: function () {
             var self = this;
             // for each of the playlists create an option in select box
-            this.$el.find('select').html(function (){
+            this.$el.find('.list').html(function (){
                 var lists = [];
                 self.collection.forEach(function (playlist) {
                     lists.push(Mustache.render(self.template, playlist.toJSON()));
@@ -130,46 +162,45 @@
             this.route = 'playlists';
             // TODO: only re-render when view is visible
             this.collection.on('change add reset', this.render, this);
+            // handle uniqueness of titles
+            this.collection.on('error', function (model, error) {
+                this.add();
+            }, this);
             this.render();
         },
         // Events handlers map
         events: {
-            "click .playlist-new" : "add",
-            "click option" : "select",
+            "click .playlists-new" : "add",
+            "click li" : "select"
         },
+        // TODO: ask for truly unique titles
         // Add new playlist and then select it
         add: function () {
-            var name = prompt("Please enter the name of new playlist"), playlist;
+            var name = prompt("Please enter unique name of new playlist"), playlist;
+            // if (this.collection.any(function (playlist) {
+            //     return name === playlist.get('title');
+            // })) return this.add();
+
             this.collection.add(name ? { title: name } : {});
             playlist = this.collection.last();
-            this.setActive(playlist);
+            this.collection.setActive(playlist);
         },
         // Remove playlist
         // @param {Object} playlist – playlist model
         remove: function (playlist) {
 
         },
-        // Handle select box change
+        // Handle click on playlist
         // @param {Object} e – DOM event object propagated from this.$el
         select: function (e) {
-            this.setActive(this.collection.getByCid(e.target.value));
-        },
-        // Select playlist
-        // @param {Object} playlist – playlist model
-        setActive: function (playlist) {
-            console.log('setting active playlist ' + playlist.get('title'));
-
-            if (!(this.collection.active && this.collection.active === playlist)) {
-                this.collection.active = playlist;
-                this.collection.activeView = new yayo.PlaylistView({ model: playlist });
-            }
-            // save references to active playlist and its view
-            this.collection.active = playlist;
-
+            // this.collection.setActive();
             // navigate to the playlist page
-            yayo.app.page(this.collection.activeView);
-            this.collection.trigger('set-active');
+            yayo.router.navigate(
+                "playlists/" + 
+                encodeURIComponent(this.collection.getByCid(e.target.dataset.playlistId).get('title')),
+                true
+            );
         }
     });
 
-}(window.yayo || (window.yayo = {}))
+}(window.yayo || (window.yayo = {}));

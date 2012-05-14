@@ -1,45 +1,50 @@
 <!doctype html>
 <head>
     <meta charset=utf-8>
-    <style>
-        .active {
-            font-weight:bold;
-        }
-        .hidden {
-            display:none;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="main">
-        <div class="playlists page">
-            <h3>SoundCloud playlists</h3>
-            <select size="4">
-            </select>
-            <button class="playlist-new">+ Add new playlist</button>
-        </div>
-        <div class="playlist hidden page">
-        </div>
+
+    <div class="playlists hidden page">
+        <h1 class="page-header">Your playlists</h1>
+        <a class="button playlists-new">+ Add new playlist</a>
+        <ul class="list">
+        </ul>
+    </div>
+
+    <div class="playlist hidden page">
     </div>
 
     <!-- ========================== Templates ============================= -->
+    <script type="tpl/html" id="playlist-item-tpl">
+        <li data-playlist-id={{id}}>{{title}}</li>
+    </script>
+
+    <script type="tpl/html" id="playlist-tpl">
+        <div class="page-header">
+            <a class="page-back">Back</a>
+            <h1 class="page-title">{{title}}</h1>
+        </div>
+        <div class="playlist-controls">
+            <a class="button toggle">Play</a>
+            <a class="button shuffle">Shuffle</a>
+            <a class="button play">Edit</a>
+            <a class="button shuffle">Delete</a>
+        </div>
+        {{#description}}
+        <p class="playlist-description">{{description}}</p>
+        {{/description}}
+        <ul class="list tracks">{{{tracks}}}</ul>
+    </script>
+
     <script type="tpl/html" id="track-tpl">
         <li class="track" data-track-id="{{id}}">
             <button>listen</button>
             <label>{{#search}}<input type="checkbox"> {{/search}}{{author}} – {{title}}</label>
         </li>
     </script>
-    <script type="tpl/html" id="playlist-option-tpl">
-        <option value={{id}}>{{title}}</option>
-    </script>
-    <script type="tpl/html" id="playlist-tpl">
-        <a href="#" class="back">← back</a>
-        <h3>{{title}}</h3>
-        <p class="description">{{description}}</p>
-        <button class="playlist-add" disabled>Save selected tracks to playlist</button>
-        <button class="playlist-remove">Remove this playlist</button>
-        <div class="tracks"></div>
-    </script>
+
     <script type="tpl/html" id="search-tpl">
         <form action="/">
             <input class="search-input" placeholder="search for tracks">
@@ -53,7 +58,8 @@
         $LAB
         // SC SDK
         .script(
-            'http://connect.soundcloud.com/sdk.js'
+            // 'http://connect.soundcloud.com/sdk.js'
+            'lib/sdk.js'
         )
         // detect mobile browsers
         .script('lib/ismobile.js').wait()
@@ -65,7 +71,13 @@
         ).wait()
         .script('lib/backbone.js').wait()
         // application files
-        .script('js/playlists.js', 'js/tracks.js', 'js/router.js', 'js/search.js').wait()
+        .script(
+            'js/playlists.js',
+            'js/tracks.js',
+            'js/router.js',
+            'js/search.js',
+            'js/audio.js'
+        ).wait()
         .script('js/app.js');
     </script>
 </body>
