@@ -9,11 +9,13 @@
     <div class="playlists hidden page">
         <h1 class="page-header">Your playlists</h1>
         <a class="button playlists-new">+ Add new playlist</a>
-        <ul class="list">
-        </ul>
+        <ul class="list"></ul>
     </div>
 
     <div class="playlist hidden page">
+    </div>
+
+    <div class="loading hidden">
     </div>
 
     <!-- ========================== Templates ============================= -->
@@ -23,19 +25,20 @@
 
     <script type="tpl/html" id="playlist-tpl">
         <div class="page-header">
-            <a class="page-back">Back</a>
+            <a class="page-back">◀ Playlists</a>
             <h1 class="page-title">{{title}}</h1>
         </div>
         <div class="playlist-controls">
             <a class="button toggle">Play</a>
-            <a class="button shuffle">Shuffle</a>
-            <a class="button play">Edit</a>
-            <a class="button shuffle">Delete</a>
+            <a class="button delete">Delete</a>
+            <a class="button add disabled">Add to playlist<a>
+            <!--a class="button shuffle">Shuffle</a-->
+            <!--a class="button play">Edit</a-->
         </div>
         {{#description}}
         <p class="playlist-description">{{description}}</p>
         {{/description}}
-        <ul class="list tracks">{{{tracks}}}</ul>
+        <div class="list tracks">{{{tracks}}}</div>
     </script>
 
     <script type="tpl/html" id="track-tpl">
@@ -49,7 +52,8 @@
         <form action="/">
             <input class="search-input" placeholder="search for tracks">
         </form>
-        <ul class="search-results"></ul>
+        <div class="list tracks">{{{tracks}}}</div>
+    </script>
     </script>
 
     <!-- ========================= Application ============================ -->
@@ -67,7 +71,8 @@
         .script(
             'lib/' + (window.isMobile ? 'zepto.js' : 'jquery.js'),
             'lib/underscore.js',
-            'lib/mustache.js'
+            'lib/mustache.js',
+            'lib/spin.min.js'
         ).wait()
         .script('lib/backbone.js').wait()
         // application files

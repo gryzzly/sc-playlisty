@@ -1,6 +1,6 @@
 // Tracks
 // ========================================================================
-~function (yayo) {"use strict";
+~function (yayo) {'use strict';
 
     // Generic constructors for tracks. Tracks collection that holds tracks
     // data and tracks view, that is responsible for playing these tracks.
@@ -24,7 +24,7 @@
     // Tracks collection
     var Tracks = Backbone.Collection.extend({
         model: Track,
-        url: "/tracks.json",
+        url: '/tracks.json',
         getSelected: function () {
             return this.filter(function (track) {
                 return !!track.selected;
@@ -53,7 +53,7 @@
 
     // Tracks view
     var TracksView = Backbone.View.extend({
-        tagName: 'div',
+        tagName: 'ul',
         className: 'tracks-list',
         template: $('#track-tpl').html(),
         initialize: function (isSearch) {
@@ -103,8 +103,8 @@
             return this;
         },
         events: {
-            "click button" : "handleToggle",
-            "change input" : "select"
+            'click button' : 'handleToggle',
+            'change input' : 'select'
         },
         handleToggle: function (e) {
             this.toggle(
@@ -118,11 +118,11 @@
                 element = this.$el.find('[data-track-id=' + id + ']');
             // load track
             if (this.collection.current !== track) {
-                yayo.audio.load(id, function () {
+                yayo.audio.load(id, _.bind(function () {
                     this.collection.current = track;
                      console.log(yayo.audio.isPaused());
                     this.playPause();
-                }.bind(this));
+                }, this));
             } else {
                 this.playPause();
             }
@@ -134,11 +134,12 @@
         },
         select: function (e) {
             var target = $(e.target);
-            target.parent()[(e.target.checked ? 'add' : 'remove') + 'Class']('active');
+            target.parent()[(e.target.checked ? 'add' : 'remove') + 'Class']('selected');
             var cid = target.closest('.track').data('track-id');
             this.collection.getByCid(cid).selected = e.target.checked;
             this.collection.trigger(
-                (this.collection.getSelected().length > 0 ? '' : 'de' ) + 'selected'
+                (this.collection.getSelected().length > 0 ? '' : 'de') + 
+                'selected'
             );
         }
     });

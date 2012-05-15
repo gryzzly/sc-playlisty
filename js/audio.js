@@ -15,28 +15,32 @@
 // ========================================================================
 ~function (yayo) {'use strict';
 
-    var client_id = "?client_id=7118ab0b5da08eafa2a36a2fca98a905";
+    var client_id = '?client_id=7118ab0b5da08eafa2a36a2fca98a905';
 
     yayo.audio = _.extend({
         audio: new Audio(),
         load: function (id, callback) {
             var self = this;
+            this.trigger('loading');
             this.audio.src = 'http://api.soundcloud.com/tracks/' + id + '/stream' + client_id;
             this.audio.load();
             // remove previously attached handler from Audio element
             this.audio.removeEventListener('canplay', this.currentHandler);
-            this.currentHandler = function () {
+            // store reference to the current handler 
+            this.currentHandler = _.bind(function () {
                 callback && callback();
                 this.trigger('loaded');
-            }.bind(this);
-            this.audio.addEventListener('canplay', this.currentHandler, false);
+            }, this);
+            this.audio.addEventListener('loadeddata', this.currentHandler, false);
         },
         init: function () {
-            this.audio.addEventListener('ended', function () {
+            this.audio.addEventListener('ended', _.bind(function () {
                 this.trigger('ended');
-            }.bind(this), false);
+            }, this), false);
         },
         play: function () {
+            // reset the playback if track has ended
+            if (this.audio.ended) this.audio.currentTime = 0;
             this.audio.play();
             return this;
         },

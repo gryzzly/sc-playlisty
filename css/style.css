@@ -31,7 +31,7 @@ body {
     font-family:"Lucida Grande", Helvetica, Arial, sans-serif;
     line-height:1.5;
 }
-/* Utility classes
+/* Generic classes
 =====================================================================*/
 .hidden {
     display:none;
@@ -41,14 +41,25 @@ body {
     border-radius:7px 0 7px 0;
 }
 .list {
-    list-style:none;
     color:#06C;
     padding-left:10px;
 }
     .list li {
+        list-style:none;
         margin:0 0 6px;
         cursor:pointer;
     }
+.disabled {
+    opacity:.4;
+}
+.loading {
+    background:rgba(0, 0, 0, .4);
+    position:fixed;
+    top:0;
+    right:0;
+    left:0;
+    bottom:0;
+}
 
 /* Page
 =====================================================================*/
@@ -111,4 +122,11 @@ body {
 }
 .tracks .active:before {
     content:"\0036";
+}
+
+/* Search
+=====================================================================*/
+.search form,
+.search .list {
+    padding:6px 10px;
 }

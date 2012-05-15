@@ -22,14 +22,14 @@
                 collection: (this.tracks = new yayo.Tracks.Collection())
             });
             // append tracks view to hold search results
-            this.$el.find('.search-results').html(this.tracksView.$el);
+            this.$el.find('.tracks').html(this.tracksView.$el);
             // propagate 'selected' events when tracks are selected
             this.tracks.on('selected', function () {
                 this.trigger('selected');
             }, this);
         },
         events: {
-            "submit form" : "search"
+            'submit form' : 'search'
         },
         search: function (e) {
             e.preventDefault();
@@ -39,12 +39,6 @@
                     q: this.input.val()
                 }
             });
-            yayo.router.navigate(
-                yayo.playlists.activeView.route +
-                '/search/' +
-                encodeURIComponent(this.input.val()),
-                { trigger: true }
-            );
         }
     });
 
