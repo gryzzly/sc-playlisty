@@ -67,7 +67,7 @@
             this.on('play', function () {
                 this.$el.find('.track').removeClass('active');
                 this.$el.find(
-                    '[data-track-id=' + this.collection.current.get('id') + ']'
+                    '[data-track-id=\'' + this.collection.current.get('id') + '\']'
                 ).addClass('active');
             }, this);
 
@@ -115,12 +115,11 @@
         },
         toggle: function (track) {
             var id = track.get('id'),
-                element = this.$el.find('[data-track-id=' + id + ']');
+                element = this.$el.find('[data-track-id=\'' + id + '\']');
             // load track
             if (this.collection.current !== track) {
                 yayo.audio.load(id, _.bind(function () {
                     this.collection.current = track;
-                     console.log(yayo.audio.isPaused());
                     this.playPause();
                 }, this));
             } else {

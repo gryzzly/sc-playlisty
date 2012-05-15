@@ -39,12 +39,12 @@
             this.page(this._previousPage);
         },
         initialize: function () {
+            var loading = $('.loading');
             // Always create a collection of playlists on the application start
             yayo.playlistsView = new yayo.PlaylistsView({
                 collection: (yayo.playlists = new yayo.Playlists)
             });
             // show loading 
-            var loading = $('.loading');
             yayo.audio.on('loading', function () {
                 loading.removeClass('hidden');
                 new Spinner().spin(loading[0]);

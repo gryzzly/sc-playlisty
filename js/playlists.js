@@ -191,7 +191,8 @@
 
             this.collection.add(name ? { title: name } : {});
             playlist = this.collection.last();
-            this.collection.setActive(playlist);
+            yayo.app.page(new yayo.PlaylistView({model: playlist}));
+            // this.collection.setActive(playlist);
         },
         // Remove playlist
         // @param {Object} playlist – playlist model

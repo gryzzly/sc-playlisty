@@ -25,7 +25,7 @@
             this.audio.src = 'http://api.soundcloud.com/tracks/' + id + '/stream' + client_id;
             this.audio.load();
             // remove previously attached handler from Audio element
-            this.audio.removeEventListener('canplay', this.currentHandler);
+            this.audio.removeEventListener('loadeddata', this.currentHandler);
             // store reference to the current handler 
             this.currentHandler = _.bind(function () {
                 callback && callback();
