@@ -16,9 +16,9 @@
     font-family: 'IcoMoon';
     src: url('../type/icomoon.eot');
     src: url('../type/icomoon.eot?#iefix') format('embedded-opentype'),
-        url('../type/icomoon.svg#IcoMoon') format('svg'),
         url('../type/icomoon.woff') format('woff'),
-        url('../type/icomoon.ttf') format('truetype');
+        url('../type/icomoon.ttf') format('truetype'),
+        url('../type/icomoon.svg#IcoMoon') format('svg');
     font-weight: normal;
     font-style: normal;
 }
