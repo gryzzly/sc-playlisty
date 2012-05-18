@@ -35,7 +35,7 @@
             $.ajax({
                 dataType: 'json',
                 // FIXME: remove duration interval after done debugging
-                url: yayo.SC_API + model.url + "?duration[from]=5000&duration[to]=10000",
+                url: yayo.SC_API + model.url,
                 data: _.extend({
                     format: 'json',
                     client_id: yayo.SC_ID
