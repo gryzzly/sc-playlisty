@@ -155,7 +155,6 @@
 
             if (!this.active) this.active = true;
 
-            if (activeView) {
             if (this.isSearch) {
                 if (activeView.tracksView) {
                     activeView.tracksView.trigger('deactivated');
