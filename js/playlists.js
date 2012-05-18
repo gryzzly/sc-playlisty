@@ -42,8 +42,9 @@
             this.$el.html(
                 Mustache.render(this.template, this.model.toJSON())
             );
+            this.renderTracks();
             // when there are no tracks, directly show search box
-            this["render" + (this.model.hasTracks() ? "Tracks" : "Search")]();
+            this.model.hasTracks() && this.renderSearch();
         },
 
         renderSearch: function () {
