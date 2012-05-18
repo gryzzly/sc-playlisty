@@ -154,14 +154,18 @@
                 activeView = yayo.playlists.activeView;
 
             if (!this.active) this.active = true;
+
+            if (activeView) {
             if (this.isSearch) {
-                activeView.tracksView.trigger('deactivated');
-                activeView.tracksView.active = false;
+                if (activeView.tracksView) {
+                    activeView.tracksView.trigger('deactivated');
+                    activeView.tracksView.active = false;
+                }
             } else {
-                activeView.search &&
+                if (activeView.search) {
                     (activeView.search.tracksView.active = false);
-                activeView.search &&
                     activeView.search.tracksView.trigger('deactivated');
+                }
             }
 
             // load track
