@@ -39,6 +39,7 @@ body {
 .button {
     background:#DAE8F6;
     border-radius:7px 0 7px 0;
+    cursor:pointer;
 }
 .list {
     color:#06C;
@@ -73,11 +74,15 @@ body {
     color:#fff;
     font-size:20px;
     padding:6px 10px;
+    position:relative;
 }
     .page-title {
-        display:inline-block;
+        text-align:center;
     }
     .page-back {
+        position:absolute;
+        left:6px;
+        top:10px;
         border-radius:4px;
         padding:1px 5px;
         border:1px solid #fff;
@@ -100,6 +105,11 @@ body {
 
 /* Playlist
 =====================================================================*/
+.playlist .delete {
+    position:absolute;
+    right:10px;
+    top:4px;
+}
 .playlist-controls {
     padding:6px 10px;
 }
@@ -114,19 +124,48 @@ body {
     margin:6px 5px;
     padding:6px 5px;
 }
-.tracks li:before {
+
+/* Tracks 
+=====================================================================*/
+.tracks li {
+    position:relative;
+    margin:0 0 6px;
+    padding-left:18px;
+}
+.tracks .toggler {
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    width:18px;
+}
+.tracks .toggler:before {
     font-family: 'IcoMoon';
     content:"\0037";
     color:#000;
-    margin-right:2px;
 }
-.tracks .active:before {
+.tracks .active .toggler:before {
     content:"\0036";
+}
+.tracks .controls {
+    position:absolute;
+    right:0;
+    top:4px;
+    color:#000;
+    font-size:.9em;
+    display:none;
+}
+    .tracks .track:first-child .up,
+    .tracks .track:last-child .down {
+        color:#bbb;
+    }
+.tracks .editing .controls {
+    display:block;
 }
 
 /* Search
 =====================================================================*/
-.search form,
-.search .list {
+.search-view form,
+.search-view .list {
     padding:6px 10px;
 }

@@ -4,29 +4,49 @@
 
     yayo.SC_API = 'http://api.soundcloud.com';
     yayo.SC_ID = '7118ab0b5da08eafa2a36a2fca98a905';
+    yayo.SPIN_CONFIG = {
+      lines: 13, // The number of lines to draw
+      length: 7, // The length of each line
+      width: 4, // The line thickness
+      radius: 10, // The radius of the inner circle
+      rotate: 0, // The rotation offset
+      color: '#000', // #rgb or #rrggbb
+      speed: 1, // Rounds per second
+      trail: 60, // Afterglow percentage
+      shadow: false, // Whether to render a shadow
+      hwaccel: true, // Whether to use hardware acceleration
+      className: 'spinner', // The CSS class to assign to the spinner
+      zIndex: 999, // The z-index (defaults to 2000000000)
+      top: 'auto', // Top position relative to parent in px
+      left: 'auto' // Left position relative to parent in px
+    };
+
+    // Properly kill views and provide a hook to remove references to this view
+    Backbone.View.prototype.close = function () {
+        this.$el.off();
+        this.remove();
+        this.off();
+        this.close && this.close();
+    };
 
     // Use SDK to communicate with SC
     Backbone.sync = function (method, model, options) {
         if ( method === 'read' ) {
             $.ajax({
-                dataType: 'jsonp',
-                url: yayo.SC_API + model.url,
-                data: {
+                dataType: 'json',
+                // FIXME: remove duration interval after done debugging
+                url: yayo.SC_API + model.url + "?duration[from]=5000&duration[to]=10000",
+                data: _.extend({
                     format: 'json',
                     client_id: yayo.SC_ID
-                },
+                }, options.data || {}),
                 success: options.success
             });
-            // SC.get(
-            //     // serialize data object
-            //     model.url + (options.data ? ('?' + $.param(options.data)) : ''),
-            //     { format: 'json' },
-            //     options.success
-            // );
         }
     };
 
     yayo.App = Backbone.View.extend({
+
         page: function (view) {
             // allow back navigation
             this._previousPage = this._currentPage;
@@ -35,22 +55,26 @@
             if (this._previousPage) this._previousPage.$el.addClass('hidden')
             this._currentPage.$el.removeClass('hidden');
         },
+
         back: function () {
             this.page(this._previousPage);
         },
+
         initialize: function () {
             var loading = $('.loading');
+            // append spinner 
+            var spinner = new Spinner(yayo.SPIN_CONFIG);
             // Always create a collection of playlists on the application start
             yayo.playlistsView = new yayo.PlaylistsView({
                 collection: (yayo.playlists = new yayo.Playlists)
             });
-            // show loading 
             yayo.audio.on('loading', function () {
                 loading.removeClass('hidden');
-                new Spinner().spin(loading[0]);
+                spinner.spin(loading[0]);
             });
             yayo.audio.on('loaded', function () {
                 loading.addClass('hidden');
+                spinner.stop();
             });
             loading.on('click', function (e) {
                 e.preventDefault();
@@ -60,16 +84,19 @@
     });
 
     yayo.Router = Backbone.Router.extend({
+
         routes: {
             'playlists' : 'playlists',
             'playlists/:playlist' : 'playlist',
             'playlists/:playlist/search/:query' : 'search',
             '*other' : 'defaultRoute'
         },
+
         playlists: function (playlist) {
             console.log('Route: “playlists”');
             yayo.app.page(yayo.playlistsView);
         },
+
         playlist: function (playlist) {
             console.log('Route: ”playlist”: ' + playlist);
             playlist = decodeURIComponent(playlist);
@@ -79,6 +106,7 @@
             yayo.playlists.setActive(playlist);
             yayo.app.page(yayo.playlists.activeView);
         },
+
         defaultRoute: function (other) {
             this.navigate('playlists', true);
         }

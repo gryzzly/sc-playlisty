@@ -25,15 +25,15 @@
 
     <script type="tpl/html" id="playlist-tpl">
         <div class="page-header">
-            <a class="page-back">◀ Playlists</a>
+            <a class="page-back">◀ All</a>
             <h1 class="page-title">{{title}}</h1>
+            <a class="delete">×</a>
         </div>
         <div class="playlist-controls">
             <a class="button toggle">Play</a>
-            <a class="button delete">Delete</a>
-            <a class="button add disabled">Add to playlist<a>
-            <!--a class="button shuffle">Shuffle</a-->
-            <!--a class="button play">Edit</a-->
+            <a class="button edit">Edit</a>
+            <a class="button add disabled">Add to playlist</a>
+            <a class="button search">Search</a>
         </div>
         {{#description}}
         <p class="playlist-description">{{description}}</p>
@@ -41,10 +41,38 @@
         <div class="list tracks">{{{tracks}}}</div>
     </script>
 
+    <script type="tpl/html" id="playlist-edit-tpl">
+        <div class="page-header">
+            <h1 class="page-title">
+                <input class="title-input" value="{{title}}">
+            </h1>
+            <a class="delete">×</a>
+        </div>
+        <div class="playlist-controls">
+            <a class="button toggle">Play</a>
+            <a class="button save">Save</a>
+            <a class="button add disabled">Add to playlist</a>
+            <a class="button search">Search</a>
+        </div>
+        <div class="playlist-description">
+            <textarea class="description-textarea" placeholder="optional playlist description">{{description}}</textarea>
+        </div>
+        <div class="list tracks">{{{tracks}}}</div>
+    </script>
+
     <script type="tpl/html" id="track-tpl">
         <li class="track" data-track-id="{{id}}">
-            <button>listen</button>
-            <label>{{#search}}<input type="checkbox"> {{/search}}{{author}} – {{title}}</label>
+            <span class="toggler"></span>
+            <label>
+                {{#search}}<input type="checkbox"> {{/search}}{{author}} – {{title}}
+            </label>
+            <div class="controls">
+                <span class="remove">×</span>
+                <!-- 
+                <span class="up">▲</span>
+                <span class="down">▼</span>
+                -->
+            </div>
         </li>
     </script>
 
@@ -54,7 +82,6 @@
             <input type="submit">
         </form>
         <div class="list tracks">{{{tracks}}}</div>
-    </script>
     </script>
 
     <!-- ========================= Application ============================ -->

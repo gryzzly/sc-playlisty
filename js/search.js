@@ -8,18 +8,25 @@
     // collection.
 
     yayo.SearchView = Backbone.View.extend({
+
         tagName: 'div',
-        className: 'search',
+
+        className: 'search-view',
+
         tpl: $('#search-tpl').html(),
+
         render: function () {
             this.$el.html($(this.tpl));
         },
+
         initialize: function () {
             this.render();
             this.input = this.$el.find('input');
             // tracks related to search
             this.tracksView = new yayo.Tracks.View({
                 collection: (this.tracks = new yayo.Tracks.Collection())
+            }, {
+                isSearch: true
             });
             // append tracks view to hold search results
             this.$el.find('.tracks').html(this.tracksView.$el);
@@ -28,9 +35,11 @@
                 this.trigger('selected');
             }, this);
         },
+
         events: {
             'submit form' : 'search'
         },
+
         search: function (e) {
             e.preventDefault();
             console.log('searching for ' + this.input.val());
