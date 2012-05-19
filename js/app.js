@@ -29,12 +29,11 @@
         this.close && this.close();
     };
 
-    // Use SDK to communicate with SC
+    // Communicate with SC
     Backbone.sync = function (method, model, options) {
         if ( method === 'read' ) {
             $.ajax({
                 dataType: 'json',
-                // FIXME: remove duration interval after done debugging
                 url: yayo.SC_API + model.url,
                 data: _.extend({
                     format: 'json',
@@ -61,10 +60,10 @@
         },
 
         initialize: function () {
-            var loading = $('.loading');
-            // append spinner 
-            var spinner = new Spinner(yayo.SPIN_CONFIG);
-            // Always create a collection of playlists on the application start
+            var loading = $('.loading'), spinner;
+            // initialize spinner 
+            spinner = new Spinner(yayo.SPIN_CONFIG);
+            // always create a collection of playlists on the application start
             yayo.playlistsView = new yayo.PlaylistsView({
                 collection: (yayo.playlists = new yayo.Playlists)
             });
@@ -112,6 +111,7 @@
         }
     });
 
+    // initialize app
     yayo.app = new yayo.App();
     // initialize router
     yayo.router = new yayo.Router();

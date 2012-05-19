@@ -100,7 +100,7 @@
 
         render: function () {
             var html = [];
-            // render each track and prepare player objects
+            // render each track
             this.collection.forEach(function (model) {
                 html.push(Mustache.render(this.template, {
                     title: model.get('title'),

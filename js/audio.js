@@ -1,19 +1,18 @@
 // Audio wrapper
-//
-// audio.play('src');
-// audio.on('ended', function () {
-//   audio.play(collection.next());
-// })
-// audio.on('loading', function () {
-//   view.indicateLoading();
-// })
-// audio.on('loaded', function () {
-//   view.stopLoading();
-// })
-//
-//
 // ========================================================================
 ~function (yayo) {'use strict';
+
+    // Example usage:
+    // audio.load(id); // where id is sound cloud track id
+    // audio.on('ended', function () {
+    //   audio.play(collection.next());
+    // })
+    // audio.on('loading', function () {
+    //   view.indicateLoading();
+    // })
+    // audio.on('loaded', function () {
+    //   view.stopLoading();
+    // })
 
     var client_id = '?client_id=7118ab0b5da08eafa2a36a2fca98a905';
 
@@ -21,7 +20,7 @@
 
         audio: new Audio(),
 
-        // by using "handleEvent" with eventListener we eliminate the need
+        // by using "handleEvent" as event listener we eliminate the need
         // to use Function.prototype.bind and don't waste memory for closures
         // we also don't need to create reference for each of the handlers
         // to clear them after new audio has loaded
@@ -74,6 +73,7 @@
         isPaused: function () {
             return this.audio.paused;
         }
+
     }, Backbone.Events);
 
 }(window.yayo || (window.yayo = {}));

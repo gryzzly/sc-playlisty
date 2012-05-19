@@ -44,7 +44,7 @@
             );
             this.renderTracks();
             // when there are no tracks, directly show search box
-            this.model.hasTracks() && this.renderSearch();
+            !this.model.hasTracks() && this.renderSearch();
         },
 
         renderSearch: function () {
@@ -67,7 +67,6 @@
         renderTracks: function (options) {
             this.tracksView && this.tracksView.close();
             // tracks related to a playlist
-            console.log(this.model.get('tracks'));
             this.tracksView = new yayo.Tracks.View({
                 collection: new yayo.Tracks.Collection(this.model.get('tracks'))
             });
@@ -99,9 +98,8 @@
             this.$el.off();
             // rerender things on change
             this.model.on('reset change add', function () {
-                if (!this.updatingFromTracks) {
-                    this.tracksView.collection.reset(this.model.get('tracks'));
-                }
+                if (this.updatingFromTracks) return;
+                this.tracksView.collection.reset(this.model.get('tracks'));
             }, this);
             yayo.audio.on('ended', function () {
                 this.$el.find('.toggle').text('play');
@@ -123,12 +121,10 @@
             var target = $(e.target);
             if (target.hasClass('disabled')) return;
             // add tracks from search to the playlist
-            console.log('adding tracks');
             this.model.set(
                 'tracks',
                 this.model.get('tracks').concat(this.search.tracks.getSelected())
             );
-            console.log('added tracks', this.search.tracks.getSelected());
         },
 
         list: function (e) {
@@ -165,7 +161,7 @@
         },
 
         toggleEdit: function () {
-            if (this.edit) {
+            if (this.editing) {
                 this.model.set(
                     'title',
                     this.$el.find('.title-input').val()
@@ -182,7 +178,7 @@
             } else {
                 this.renderEdit();
             }
-            this.edit = !this.edit;
+            this.editing = !this.editing;
         }
     });
 
@@ -258,14 +254,14 @@
             this.route = 'playlists';
             // TODO: only re-render when view is visible
             this.collection.on('change add reset remove', this.render, this);
-            // handle uniqueness of titles
+            // TODO: handle uniqueness of titles
             this.collection.on('error', function (model, error) {
                 this.add();
             }, this);
             this.render();
         },
 
-        // Events handlers map
+        // Event handlers map
         events: {
             'click .playlists-new' : 'add',
             'click li' : 'select'
@@ -281,19 +277,21 @@
 
             this.collection.add(name ? { title: name } : {});
             playlist = this.collection.last();
-            // yayo.app.page(new yayo.PlaylistView({model: playlist}));
-            // this.collection.setActive(playlist);
-            yayo.router.navigate('playlists/' + encodeURIComponent(playlist.get('title')), true);
+            yayo.router.navigate(
+                'playlists/' + encodeURIComponent(playlist.get('title')), 
+                true
+            );
         },
 
         // Handle click on playlist
-        // @param {Object} e – DOM event object propagated from this.$el
         select: function (e) {
-            // this.collection.setActive();
             // navigate to the playlist page
             yayo.router.navigate(
                 'playlists/' + 
-                encodeURIComponent(this.collection.getByCid(e.target.dataset.playlistId).get('title')),
+                encodeURIComponent(
+                    this.collection.getByCid(e.target.dataset.playlistId)
+                        .get('title')
+                ),
                 true
             );
         }
