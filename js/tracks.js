@@ -17,6 +17,7 @@
     // Single track model
     var Track = Backbone.Model.extend({
 
+        // caching IDs as CIDs allows for faster retrieval by getByCid
         initialize: function () {
             this.cid = this.get('id');
         }
@@ -73,17 +74,24 @@
             }, this).trigger('reset');
 
             // toggle presentation
-            this.on('pause deactivated', function () {
-                this.$el.find('.track').removeClass('active');
+            this.on('deactivated', function () {
+                this.collection.current && 
+                    this.resetTrack(this.collection.current);
+            }, this);
+            this.on('pause', function () {
+                this.$el.find('.track').removeClass('playing');
             }, this);
             this.on('play', function () {
-                this.$el.find('.track').removeClass('active');
-                this.$el.find(
-                    '[data-track-id=\'' + this.collection.current.get('id') + '\']'
-                ).addClass('active');
+                this.$el.find('.track').removeClass('playing');
+                this.trackElementById(this.collection.current.get('id'))
+                    .addClass('playing');
             }, this);
 
+            // toggle playback
             yayo.audio.on('loaded', this.handleAudioLoaded, this);
+
+            // update current time display
+            yayo.audio.on('timeupdate', this.handleAudioTimeUpdate, this);
 
             // play consequent tracks
             yayo.audio.on('ended', this.handleAudioEnded, this);
@@ -106,7 +114,8 @@
                     title: model.get('title'),
                     author: model.get('user') && model.get('user').username,
                     id: model.get('id'),
-                    search: this.isSearch
+                    search: this.isSearch,
+                    duration: _secondsToTime(model.get('duration') / 1000)
                 }));
             }, this);
             // insert collection into the DOM
@@ -134,9 +143,7 @@
             var track = this.collection.getByCid(
                 $(e.target).closest('.track').data('track-id')
             );
-            this.$el.find(
-                '[data-track-id=\'' + track.get('id') + '\']'
-            ).remove();
+            this.trackElementById(track.get('id')).remove();
             this.collection.remove(track);
         },
 
@@ -148,13 +155,13 @@
 
         toggle: function (track) {
             var id = track.get('id'),
-                // inner quotes are reuired for Opera to comprehend
-                // data-attribute selector
-                element = this.$el.find('[data-track-id=\'' + id + '\']'),
-                activeView = yayo.playlists.activeView;
+                element = this.trackElementById(id),
+                activeView = yayo.playlists.activeView,
+                currentTrack = this.collection.current;
 
+            // ensure the right tracks collection is communicating
+            // with audio
             if (!this.active) this.active = true;
-
             if (this.isSearch) {
                 if (activeView.tracksView) {
                     activeView.tracksView.trigger('deactivated');
@@ -168,7 +175,12 @@
             }
 
             // load track
-            if (this.collection.current !== track) {
+            if (currentTrack !== track) {
+                // set previous track's duration to initial value
+                currentTrack && this.resetTrack(currentTrack);
+                // toggle presentation
+                this.trackElementById(track.cid).addClass('current');
+                // update collection state
                 this.collection.current = track;
                 yayo.audio.load(id);
             } else {
@@ -198,18 +210,11 @@
             this.playPause();
         },
 
-        handleAudioError: function () {
-            if (!this.active) return;
-            this.$el.find(
-                '[data-track-id=\'' + this.collection.current.get('id') + '\']'
-            ).remove();
-            this.collection.remove(this.collection.current);
-        },
-
         handleAudioEnded: function () {
             if (!this.active) return;
             var tracks = this.collection;
-            this.$el.find('.track').removeClass('active');
+            this.resetTrack(tracks.current);
+            // toggle next track
             if (!this.isSearch && tracks.current && tracks.length > 0) {
                 tracks.current !== tracks.last() ?
                     this.toggle(tracks.next()) :
@@ -217,12 +222,52 @@
             }
         }, 
 
+        handleAudioTimeUpdate: function () {
+            if (!this.active) return;
+            var track = this.collection.current;
+            if (!track) return;
+            this.trackElementById(this.collection.current.get('id'))
+                .find('.track-duration').text(
+                    _secondsToTime(
+                        track.get('duration') / 1000 - yayo.audio.currentTime()
+                    )
+                );
+        },
+
+        handleAudioError: function () {
+            if (!this.active) return;
+            this.trackElementById(this.collection.current.get('id')).remove();
+            this.collection.remove(this.collection.current);
+        },
+
+        trackElementById: function (id) {
+            // inner quotes are reuired for Opera to comprehend
+            // data-attribute selector
+            return this.$el.find('[data-track-id=\'' + id + '\']');
+        },
+
+        resetTrack: function (track) {
+            this.trackElementById(track.cid).removeClass('playing current')
+                .find('.track-duration')
+                .text(_secondsToTime(track.get('duration') / 1000));
+        },
+
         close: function () {
             yayo.audio.off('loaded', this.handleAudioLoaded);
             yayo.audio.off('error', this.handleAudioError);
+            yayo.audio.off('timeupdate', this.handleAudioTimeUpdate);
             yayo.audio.off('ended', this.handleAudioEnded);
         }
     });
+
+    var _secondsToTime = function (seconds) {
+        var hours   = ~~(seconds / 3600),
+            minutes = ~~((seconds - (hours * 3600)) / 60);
+        
+        seconds = ~~(seconds - (hours * 3600) - (minutes * 60));
+        seconds < 10 && (seconds = '0' + seconds);
+        return (hours ? (hours + ':') : '') + minutes + ':' + seconds;
+    };
 
     return yayo.Tracks = {
         Model: Track,

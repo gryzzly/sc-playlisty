@@ -20,19 +20,22 @@
 
         audio: new Audio(),
 
-        // by using "handleEvent" as event listener we eliminate the need
+        // by using 'handleEvent' as event listener we eliminate the need
         // to use Function.prototype.bind and don't waste memory for closures
         // we also don't need to create reference for each of the handlers
         // to clear them after new audio has loaded
         handleEvent: function (e) {
             switch (e.type) {
-                case "loadeddata": 
+                case 'loadeddata': 
                     this.trigger('loaded');
                     break;
-                case "ended":
+                case 'ended':
                     this.trigger('ended');
                     break;
-                case "error":
+                case 'timeupdate':
+                    this.trigger('timeupdate');
+                    break;
+                case 'error':
                     this.trigger('error');
                     break;
             }
@@ -40,7 +43,7 @@
 
         load: function (id, callback) {
             var audio = this.audio,
-                events = ['loadeddata', 'ended', 'error'];
+                events = ['loadeddata', 'ended', 'error', 'timeupdate'];
 
             this.trigger('loading');
             audio.src = 'http://api.soundcloud.com/tracks/' + id + '/stream' + client_id;
@@ -72,6 +75,10 @@
 
         isPaused: function () {
             return this.audio.paused;
+        },
+
+        currentTime: function () {
+            return ~~this.audio.currentTime;
         }
 
     }, Backbone.Events);
