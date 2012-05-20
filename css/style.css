@@ -54,7 +54,7 @@ body {
     opacity:.4;
 }
 .loading {
-    background:rgba(0, 0, 0, .4);
+    background:rgba(255, 255, 255, .75);
     position:fixed;
     top:0;
     right:0;
@@ -115,6 +115,7 @@ body {
 }
     .playlist-controls .button {
         display:inline-block;
+        text-transform:capitalize;
         height:24px;
         padding:0 5px;
     }
@@ -141,10 +142,11 @@ body {
 }
 .tracks .toggler:before {
     font-family: 'IcoMoon';
+    font-weight:normal;
     content:"\0037";
     color:#000;
 }
-.tracks .active .toggler:before {
+.tracks .playing .toggler:before {
     content:"\0036";
 }
 .tracks .controls {
@@ -161,6 +163,13 @@ body {
     }
 .tracks .editing .controls {
     display:block;
+}
+.track.current {
+    font-weight:bold;
+}
+.track .time {
+    font-weight:normal;
+    color:#555;
 }
 
 /* Search
