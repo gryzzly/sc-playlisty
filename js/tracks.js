@@ -128,6 +128,10 @@
             'click .remove' : 'handleRemove',
             'click .up' : 'handleUp',
             'click .down' : 'handleDown',
+            'touchup .toggler' : 'handleToggle',
+            'touchup .remove' : 'handleRemove',
+            'touchup .up' : 'handleUp',
+            'touchup .down' : 'handleDown',
             'change input' : 'select'
         },
 

@@ -115,6 +115,13 @@
             'click .search' : 'toggleSearch',
             'click .edit' : 'toggleEdit',
             'click .save' : 'toggleEdit'
+            'touchup .add': 'addTracks',
+            'touchup .page-back': 'list',
+            'touchup .toggle' : 'toggleAudio',
+            'touchup .delete' : 'deletePlaylist',
+            'touchup .search' : 'toggleSearch',
+            'touchup .edit' : 'toggleEdit',
+            'touchup .save' : 'toggleEdit'
         },
 
         addTracks: function (e) {
@@ -264,7 +271,9 @@
         // Event handlers map
         events: {
             'click .playlists-new' : 'add',
-            'click li' : 'select'
+            'click li' : 'select',
+            'touchup .playlists-new' : 'add',
+            'touchup li' : 'select'
         },
 
         // TODO: ask for truly unique titles

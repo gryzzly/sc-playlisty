@@ -29,6 +29,9 @@
         this.close && this.close();
     };
 
+    // enable :active on mobile devices
+    document.addEventListener('touchend', function(){});
+
     // Communicate with SC
     Backbone.sync = function (method, model, options) {
         if ( method === 'read' ) {
@@ -78,7 +81,7 @@
                 loading.addClass('hidden');
                 spinner.stop();
             });
-            loading.on('click', function (e) {
+            loading.on('click touchup', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
             });
