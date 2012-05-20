@@ -40,7 +40,7 @@
                 url: yayo.SC_API + model.url,
                 data: _.extend({
                     format: 'json',
-                    client_id: yayo.SC_ID,
+                    client_id: yayo.SC_ID
                     // good for debugging
                     // 'duration[from]': 5000,
                     // 'duration[to]': 8000
@@ -57,7 +57,7 @@
             this._previousPage = this._currentPage;
             this._currentPage = view;
             // toggle DOM classes
-            if (this._previousPage) this._previousPage.$el.addClass('hidden')
+            if (this._previousPage) this._previousPage.$el.addClass('hidden');
             this._currentPage.$el.removeClass('hidden');
         },
 
@@ -124,4 +124,4 @@
     // initialize history
     Backbone.history.start();
 
-}(window.yayo || (window.yayo = {}))
+}(window.yayo || (window.yayo = {}));

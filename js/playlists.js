@@ -114,7 +114,7 @@
             'click .delete' : 'deletePlaylist',
             'click .search' : 'toggleSearch',
             'click .edit' : 'toggleEdit',
-            'click .save' : 'toggleEdit'
+            'click .save' : 'toggleEdit',
             'touchup .add': 'addTracks',
             'touchup .page-back': 'list',
             'touchup .toggle' : 'toggleAudio',
@@ -137,7 +137,7 @@
         list: function (e) {
             e.preventDefault();
             console.log('to list view');
-            yayo.router.navigate('playlists', true)
+            yayo.router.navigate('playlists', true);
         },
 
         toggleAudio: function (e) {
@@ -149,7 +149,7 @@
             if (!confirm('Are you sure you want to remove this playlist?')) return;
             this.$el.html('');
             this.model.collection.remove(this.model);
-            yayo.router.navigate('playlists', true)
+            yayo.router.navigate('playlists', true);
         },
 
         toggleSearch: function () {
