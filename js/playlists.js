@@ -108,13 +108,13 @@
         },
 
         events: {
-            yayo.down + '.add': 'addTracks',
-            yayo.down + '.page-back': 'list',
-            yayo.down + '.toggle' : 'toggleAudio',
-            yayo.down + '.delete' : 'deletePlaylist',
-            yayo.down + '.search' : 'toggleSearch',
-            yayo.down + '.edit' : 'toggleEdit',
-            yayo.down + '.save' : 'toggleEdit'
+            yayo.down + ' .add': 'addTracks',
+            yayo.down + ' .page-back': 'list',
+            yayo.down + ' .toggle' : 'toggleAudio',
+            yayo.down + ' .delete' : 'deletePlaylist',
+            yayo.down + ' .search' : 'toggleSearch',
+            yayo.down + ' .edit' : 'toggleEdit',
+            yayo.down + ' .save' : 'toggleEdit'
         },
 
         addTracks: function (e) {
