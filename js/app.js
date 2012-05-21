@@ -81,7 +81,7 @@
                 loading.addClass('hidden');
                 spinner.stop();
             });
-            loading.on('click touchup', function (e) {
+            loading.on(yayo.down, function (e) {
                 e.preventDefault();
                 e.stopPropagation();
             });
