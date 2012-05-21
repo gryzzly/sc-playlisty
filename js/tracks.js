@@ -69,6 +69,14 @@
         template: $('#track-tpl').html(),
 
         initialize: function (options, customOptions) {
+            // hack to conditionally construct event handler names
+            this.events = this.events || {};
+            this.events[yayo.down + ' .toggler'] = 'handleToggle',
+            this.events[yayo.down + ' .remove'] = 'handleRemove',
+            this.events[yayo.down + ' .up'] = 'handleUp',
+            this.events[yayo.down + ' .down'] = 'handleDown',
+            this.delegateEvents();
+
             this.collection.on('reset', function () {
                 this.render();
             }, this).trigger('reset');
@@ -124,10 +132,6 @@
         },
 
         events: {
-            yayo.down + ' .toggler' : 'handleToggle',
-            yayo.down + ' .remove' : 'handleRemove',
-            yayo.down + ' .up' : 'handleUp',
-            yayo.down + ' .down' : 'handleDown',
             'change input' : 'select'
         },
 

@@ -96,6 +96,18 @@
             // so we need to unbind all event handlers bound to `this.$el`
             // by previous instances
             this.$el.off();
+            
+            // hack to conditionally construct event handler names
+            this.events = this.events || {};
+            this.events[yayo.down + ' .add'] = 'addTracks';
+            this.events[yayo.down + ' .page-back'] = 'list';
+            this.events[yayo.down + ' .toggle'] = 'toggleAudio';
+            this.events[yayo.down + ' .delete'] = 'deletePlaylist';
+            this.events[yayo.down + ' .search'] = 'toggleSearch';
+            this.events[yayo.down + ' .edit'] = 
+                this.events[yayo.down + ' .save'] = 'toggleEdit';
+            this.delegateEvents();
+
             // rerender things on change
             this.model.on('reset change add', function () {
                 if (this.updatingFromTracks) return;
@@ -105,16 +117,6 @@
                 this.$el.find('.toggle').text('play');
             }, this);
             this.render();
-        },
-
-        events: {
-            yayo.down + ' .add': 'addTracks',
-            yayo.down + ' .page-back': 'list',
-            yayo.down + ' .toggle' : 'toggleAudio',
-            yayo.down + ' .delete' : 'deletePlaylist',
-            yayo.down + ' .search' : 'toggleSearch',
-            yayo.down + ' .edit' : 'toggleEdit',
-            yayo.down + ' .save' : 'toggleEdit'
         },
 
         addTracks: function (e) {
@@ -251,6 +253,12 @@
 
         // Attach event handlers and render the view
         initialize: function () {
+            // hack to conditionally construct event handler names
+            this.events = this.events || {};
+            this.events[yayo.down + ' .playlists-new'] = 'add';
+            this.events[yayo.down + ' li'] = 'select';
+            this.delegateEvents();
+
             this.route = 'playlists';
             // TODO: only re-render when view is visible
             this.collection.on('change add reset remove', this.render, this);
@@ -259,12 +267,6 @@
                 this.add();
             }, this);
             this.render();
-        },
-
-        // Event handlers map
-        events: {
-            yayo.down + '.playlists-new' : 'add',
-            yayo.down + 'li' : 'select'
         },
 
         // TODO: ask for truly unique titles
