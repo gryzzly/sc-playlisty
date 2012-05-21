@@ -124,14 +124,10 @@
         },
 
         events: {
-            'click .toggler' : 'handleToggle',
-            'click .remove' : 'handleRemove',
-            'click .up' : 'handleUp',
-            'click .down' : 'handleDown',
-            'touchup .toggler' : 'handleToggle',
-            'touchup .remove' : 'handleRemove',
-            'touchup .up' : 'handleUp',
-            'touchup .down' : 'handleDown',
+            yayo.down + '.toggler' : 'handleToggle',
+            yayo.down + '.remove' : 'handleRemove',
+            yayo.down + '.up' : 'handleUp',
+            yayo.down + '.down' : 'handleDown',
             'change input' : 'select'
         },
 

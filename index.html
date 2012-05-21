@@ -88,6 +88,13 @@
     <!-- ========================= Application ============================ -->
     <script src="lib/LAB.js"></script>
     <script>
+        // yayo.down holds reference to either touch or click event depending
+        // on environment
+        window.yayo = {
+            down: ("ontouchstart" in window) ? "touchup" : "click"
+        };
+    </script>
+    <script>
         $LAB
         // detect mobile browsers
         .script('lib/ismobile.js').wait()

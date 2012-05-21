@@ -108,20 +108,13 @@
         },
 
         events: {
-            'click .add': 'addTracks',
-            'click .page-back': 'list',
-            'click .toggle' : 'toggleAudio',
-            'click .delete' : 'deletePlaylist',
-            'click .search' : 'toggleSearch',
-            'click .edit' : 'toggleEdit',
-            'click .save' : 'toggleEdit',
-            'touchup .add': 'addTracks',
-            'touchup .page-back': 'list',
-            'touchup .toggle' : 'toggleAudio',
-            'touchup .delete' : 'deletePlaylist',
-            'touchup .search' : 'toggleSearch',
-            'touchup .edit' : 'toggleEdit',
-            'touchup .save' : 'toggleEdit'
+            yayo.down + '.add': 'addTracks',
+            yayo.down + '.page-back': 'list',
+            yayo.down + '.toggle' : 'toggleAudio',
+            yayo.down + '.delete' : 'deletePlaylist',
+            yayo.down + '.search' : 'toggleSearch',
+            yayo.down + '.edit' : 'toggleEdit',
+            yayo.down + '.save' : 'toggleEdit'
         },
 
         addTracks: function (e) {
@@ -270,10 +263,8 @@
 
         // Event handlers map
         events: {
-            'click .playlists-new' : 'add',
-            'click li' : 'select',
-            'touchup .playlists-new' : 'add',
-            'touchup li' : 'select'
+            yayo.down + '.playlists-new' : 'add',
+            yayo.down + 'li' : 'select'
         },
 
         // TODO: ask for truly unique titles
